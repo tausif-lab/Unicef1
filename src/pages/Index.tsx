@@ -27,7 +27,7 @@ import workflow from '../assets/workflow-bg.jpg'
 import { cn } from "../lib/utils";
 import { TestimonialCard, type TestimonialAuthor } from "../components/ui/testimonial-card";
 
-import WasteClassifier from '../components/WasteClassifier';
+import {WasteClassifier} from '../components/WasteClassifier';
 import {
   Leaf,
   Users,
