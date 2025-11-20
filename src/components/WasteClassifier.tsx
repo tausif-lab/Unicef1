@@ -1,5 +1,5 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import * as tf from '@tensorflow/tfjs';
 import * as mobilenet from '@tensorflow-models/mobilenet';
 
@@ -55,8 +55,8 @@ const WasteClassifier = () => {
         canvas.height = video.videoHeight;
         context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
 
-        const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-        const predictions = await model.classify(imageData);
+        const imgTensor = tf.browser.fromPixels(canvas);
+        const predictions = await model.classify(imgTensor);
         mapPredictionsToWasteCategory(predictions);
       }
     }
