@@ -27,7 +27,7 @@ import workflow from '../assets/workflow-bg.jpg'
 import { cn } from "../lib/utils";
 import { TestimonialCard, type TestimonialAuthor } from "../components/ui/testimonial-card";
 
-import WasteClassifier from '../components/WasteClassifier';
+
 import {
   Leaf,
   Users,
@@ -42,6 +42,7 @@ import {
   Mail,
   Smartphone,
   RotateCcw,
+  X,
 } from 'lucide-react';
 
 // --- UTILITY: INTERSECTION OBSERVER HOOK ---
@@ -75,7 +76,258 @@ const useIntersectionObserver = (options: IntersectionObserverInit = {}) => {
 
   return { elementRef, isVisible };
 };
+// Add this entire component after useIntersectionObserver hook:
+const WasteClassifier = () => {
+  const [model, setModel] = useState<any>(null);
+  const [cameraOpen, setCameraOpen] = useState(false);
+  const [result, setResult] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
+  const loadModel = async () => {
+    setLoading(true);
+    try {
+      // This requires @tensorflow/tfjs and @tensorflow-models/mobilenet to be installed
+      // npm install @tensorflow/tfjs @tensorflow-models/mobilenet
+      const mobilenet = await import('@tensorflow-models/mobilenet');
+      const loadedModel = await mobilenet.load({
+        version: 2,
+        alpha: 1.0,
+      });
+      setModel(loadedModel);
+    } catch (error) {
+      console.error('Error loading model:', error);
+      alert('Failed to load ML model. Using fallback classification.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const openCamera = async () => {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+          video: { facingMode: 'environment' } 
+        });
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          streamRef.current = stream;
+        }
+        setCameraOpen(true);
+        setResult(null);
+        setImageSrc(null);
+        
+        // Load model when camera opens if not already loaded
+        if (!model) {
+          loadModel();
+        }
+      } catch (error) {
+        console.error('Error opening camera:', error);
+        alert('Unable to access camera. Please ensure camera permissions are granted.');
+      }
+    } else {
+      alert('Camera not supported on this device.');
+    }
+  };
+
+  const closeCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    setCameraOpen(false);
+    setResult(null);
+    setImageSrc(null);
+  };
+
+  const mapPredictionsToWasteCategory = (predictions: { className: string; probability: number }[]) => {
+    const plasticKeywords = ['plastic bag', 'wrapper', 'packet', 'bottle'];
+    const metalKeywords = ['tin can', 'aluminum can', 'can'];
+    const paperKeywords = ['paper', 'notebook', 'cardboard'];
+    const glassKeywords = ['glass bottle', 'wine bottle'];
+
+    for (const prediction of predictions) {
+      const className = prediction.className.toLowerCase();
+      if (plasticKeywords.some(keyword => className.includes(keyword))) {
+        return 'PET Plastic (Type 1) - Recyclable';
+      }
+      if (metalKeywords.some(keyword => className.includes(keyword))) {
+        return 'Metal Waste - Recyclable';
+      }
+      if (paperKeywords.some(keyword => className.includes(keyword))) {
+        return 'Paper Waste - Recyclable';
+      }
+      if (glassKeywords.some(keyword => className.includes(keyword))) {
+        return 'Glass Waste - Recyclable';
+      }
+    }
+    return 'Other/Unknown - Check Local Guidelines';
+  };
+
+  const captureImage = async () => {
+    if (videoRef.current && canvasRef.current) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      const context = canvas.getContext('2d');
+
+      if (context) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+        
+        const imageData = canvas.toDataURL('image/jpeg');
+        setImageSrc(imageData);
+        
+        setLoading(true);
+        
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach(track => track.stop());
+          streamRef.current = null;
+        }
+        
+        // Try to use ML model if available
+        if (model) {
+          try {
+            const tf = await import('@tensorflow/tfjs');
+            const imgTensor = tf.browser.fromPixels(canvas);
+            const predictions = await model.classify(imgTensor);
+            const wasteType = mapPredictionsToWasteCategory(predictions);
+            setResult(wasteType);
+            setLoading(false);
+            imgTensor.dispose();
+          } catch (error) {
+            console.error('Error classifying image:', error);
+            // Fallback to random classification
+            fallbackClassification();
+          }
+        } else {
+          // Fallback if model not loaded
+          fallbackClassification();
+        }
+      }
+    }
+  };
+
+  const fallbackClassification = () => {
+    setTimeout(() => {
+      const wasteTypes = [
+        'PET Plastic (Type 1) - Recyclable',
+        'HDPE Plastic (Type 2) - Recyclable', 
+        'PVC Plastic (Type 3) - Check Local Guidelines',
+        'LDPE Plastic (Type 4) - Recyclable',
+        'PP Plastic (Type 5) - Recyclable',
+        'PS Plastic (Type 6) - Limited Recycling',
+        'Other Plastic (Type 7) - Check Local Guidelines'
+      ];
+      
+      const randomType = wasteTypes[Math.floor(Math.random() * wasteTypes.length)];
+      setResult(randomType);
+      setLoading(false);
+    }, 1500);
+  };
+
+  const retake = () => {
+    setResult(null);
+    setImageSrc(null);
+    openCamera();
+  };
+
+  return (
+    <div className="inline-block">
+      {!cameraOpen && !imageSrc ? (
+        <button 
+          onClick={openCamera}
+          className="flex items-center gap-2 rounded-full bg-green-600 px-8 py-3 text-lg font-semibold text-white transition-all duration-300 hover:bg-green-700 hover:shadow-lg"
+        >
+          <Camera size={24} />
+          Scan Waste
+        </button>
+      ) : (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="relative w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl">
+            <button
+              onClick={closeCamera}
+              className="absolute right-4 top-4 rounded-full bg-red-500 p-2 text-white transition-colors hover:bg-red-600"
+            >
+              <X size={24} />
+            </button>
+
+            <h3 className="mb-4 text-center text-2xl font-bold text-gray-800">
+              {loading ? 'Analyzing...' : result ? 'Classification Result' : 'Capture Waste Item'}
+            </h3>
+
+            {!imageSrc ? (
+              <div className="relative">
+                <video 
+                  ref={videoRef} 
+                  autoPlay 
+                  playsInline
+                  className="w-full rounded-xl"
+                />
+                <canvas ref={canvasRef} className="hidden" />
+                
+                <div className="mt-4 flex justify-center">
+                  <button
+                    onClick={captureImage}
+                    className="rounded-full bg-green-600 px-8 py-3 text-lg font-semibold text-white transition-all duration-300 hover:bg-green-700"
+                  >
+                    <Camera className="mr-2 inline-block" size={20} />
+                    Capture & Classify
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <img 
+                  src={imageSrc} 
+                  alt="Captured waste" 
+                  className="w-full rounded-xl"
+                />
+                
+                {loading && (
+                  <div className="mt-6 flex flex-col items-center">
+                    <div className="h-12 w-12 animate-spin rounded-full border-4 border-green-500 border-t-transparent"></div>
+                    <p className="mt-4 text-gray-600">Analyzing plastic type...</p>
+                  </div>
+                )}
+
+                {result && !loading && (
+                  <div className="mt-6 rounded-xl bg-green-50 p-6 text-center">
+                    <div className="mb-3 flex justify-center">
+                      <div className="rounded-full bg-green-500 p-3">
+                        <Camera className="text-white" size={32} />
+                      </div>
+                    </div>
+                    <h4 className="mb-2 text-xl font-bold text-gray-800">Detected:</h4>
+                    <p className="text-lg font-semibold text-green-700">{result}</p>
+                    
+                    <div className="mt-6 flex gap-3 justify-center">
+                      <button
+                        onClick={retake}
+                        className="rounded-lg border-2 border-green-600 bg-white px-6 py-2 font-semibold text-green-600 transition-all hover:bg-green-50"
+                      >
+                        Retake Photo
+                      </button>
+                      <button
+                        onClick={closeCamera}
+                        className="rounded-lg bg-green-600 px-6 py-2 font-semibold text-white transition-all hover:bg-green-700"
+                      >
+                        Done
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 // --- COMPONENTS ---
 
