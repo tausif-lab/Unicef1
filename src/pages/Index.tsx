@@ -42,7 +42,7 @@ import {
   Mail,
   Smartphone,
   RotateCcw,
-  X,
+  
 } from 'lucide-react';
 
 // --- UTILITY: INTERSECTION OBSERVER HOOK ---
@@ -235,7 +235,7 @@ const Hero = () => {
             Learn More
           </button>
         </div>
-        
+
       </div>
     </section>
   );
