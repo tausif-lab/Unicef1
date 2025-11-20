@@ -5,9 +5,9 @@ import path from 'path'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  server: {
-allowedHosts: ["263f5293.ngrok-free.app"]
-},
+  optimizeDeps: {
+    exclude: ['@tensorflow/tfjs', '@tensorflow-models/mobilenet']
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
