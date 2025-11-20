@@ -27,7 +27,7 @@ import workflow from '../assets/workflow-bg.jpg'
 import { cn } from "../lib/utils";
 import { TestimonialCard, type TestimonialAuthor } from "../components/ui/testimonial-card";
 
-const WasteClassifier = React.lazy(() => import('../components/WasteClassifier'));
+import WasteClassifier from '../components/WasteClassifier';
 import {
   Leaf,
   Users,
@@ -120,9 +120,7 @@ const Hero = () => {
         </p>
 
         <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:gap-6">
-          <React.Suspense fallback={<div>Loading...</div>}>
-            <WasteClassifier />
-          </React.Suspense>
+          <WasteClassifier />
           <button className="rounded-full border border-white px-8 py-3 text-lg font-semibold text-white transition-all duration-300 hover:bg-white hover:text-green-600">
             Learn More
           </button>
