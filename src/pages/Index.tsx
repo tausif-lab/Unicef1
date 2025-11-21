@@ -1,26 +1,4 @@
-/*import { Navigation } from "../components/Navigation";
-import { Hero } from "../components/Hero";
-import { ProposedSolution } from "../components/ProposedSolution";
-import { WorkflowProcess } from "../components/WorkflowProcess";
-import { Benefits } from "../components/Benefits";
-import { Testimonials } from "../components/Testimonials";
-import { Footer } from "../components/Footer";
 
-const Index = () => {
-  return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-      <Hero />
-      <ProposedSolution />
-      <WorkflowProcess />
-      <Benefits />
-      <Testimonials />
-      <Footer />
-    </div>
-  );
-};
-
-export default Index;*/
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import workflow from '../assets/workflow-bg.jpg'
@@ -41,6 +19,7 @@ import {
   LogIn,
   Mail,
   Smartphone,
+  AlertCircle,
   RotateCcw,
   
 } from 'lucide-react';
@@ -76,118 +55,274 @@ const useIntersectionObserver = (options: IntersectionObserverInit = {}) => {
 
   return { elementRef, isVisible };
 };
-import * as tf from '@tensorflow/tfjs';
-import * as mobilenet from '@tensorflow-models/mobilenet';
 
-const WasteClassifier = () => {
-  const [model, setModel] = useState<mobilenet.MobileNet | null>(null);
-  const [loading, setLoading] = useState(false);
+
+
+
+
+
+
+interface Prediction {
+  className: string;
+  probability: number;
+}
+
+ 
+
+const WasteClassifier: React.FC = () => {
+  const [model, setModel] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [result, setResult] = useState<string | null>(null);
   const [cameraOpen, setCameraOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const loadModel = async () => {
-    setLoading(true);
-    try {
-      const model = await mobilenet.load({
-        version: 2,
-        alpha: 1.0,
-        modelUrl: 'https://tfhub.dev/google/tfjs-model/imagenet/mobilenet_v2_100_224/classification/4/model.json',
-      });
-      setModel(model);
-    } catch (error) {
-      console.error('Error loading model:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const openCamera = async () => {
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+  // Load scripts and model - single combined effect
+  useEffect(() => {
+    const initializeModel = async () => {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
-        setCameraOpen(true);
-        if (!model) {
-          loadModel();
-        }
-      } catch (error) {
-        console.error('Error opening camera:', error);
-      }
-    }
-  };
+        setLoading(true);
+        setError(null);
 
-  const classifyImage = async () => {
-    if (model && videoRef.current && canvasRef.current) {
+        // Step 1: Load TensorFlow.js
+        if (!(window as any).tf) {
+          await new Promise<void>((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0';
+            script.async = true;
+            script.onload = () => resolve();
+            script.onerror = () => reject(new Error('Failed to load TensorFlow'));
+            document.head.appendChild(script);
+          });
+        }
+
+        // Step 2: Load MobileNet
+        if (!(window as any).mobilenet) {
+          await new Promise<void>((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0';
+            script.async = true;
+            script.onload = () => resolve();
+            script.onerror = () => reject(new Error('Failed to load MobileNet'));
+            document.head.appendChild(script);
+          });
+        }
+
+        // Step 3: Access and load model
+        const tf = (window as any).tf;
+        const mobilenet = (window as any).mobilenet;
+
+        if (!tf || !mobilenet) {
+          throw new Error('TensorFlow or MobileNet not available');
+        }
+
+        console.log('Loading MobileNet model...');
+        const loadedModel = await mobilenet.load();
+        setModel(loadedModel);
+        console.log('MobileNet Model Loaded Successfully!');
+        setLoading(false);
+      } catch (err) {
+        console.error('Error initializing model:', err);
+        setError('Failed to load AI model. Please refresh the page.');
+        setLoading(false);
+      }
+    };
+
+    initializeModel();
+  }, []);
+
+  const openCamera = useCallback(async () => {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setError('Camera access is not supported by your browser.');
+      return;
+    }
+
+    setError(null);
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: 'environment',
+          width: { ideal: 640 },
+          height: { ideal: 480 }
+        }
+      });
+
+      if (videoRef.current) {
+        const video = videoRef.current;
+        video.srcObject = stream;
+
+        try {
+          if (video.readyState >= 1) {
+            await video.play().catch(() => {});
+          } else {
+            await new Promise<void>((resolve) => {
+              const onLoaded = () => {
+                video.play().finally(() => resolve());
+              };
+              video.addEventListener('loadedmetadata', onLoaded, { once: true });
+            });
+          }
+        } catch (err) {
+          console.warn('Error starting video:', err);
+        }
+
+        setCameraOpen(true);
+        setResult(null);
+      }
+    } catch (err) {
+      console.error('Error opening camera:', err);
+      setError('Could not open camera. Please check permissions.');
+    }
+  }, []);
+
+  const classifyImage = useCallback(async () => {
+    if (!model || !videoRef.current || !canvasRef.current || !cameraOpen) {
+      setError('Camera or model not ready.');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
       const video = videoRef.current;
       const canvas = canvasRef.current;
       const context = canvas.getContext('2d');
 
-      if (context) {
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+      if (!context) {
+        setError('Could not get canvas context.');
+        setLoading(false);
+        return;
+      }
 
-        const imgTensor = tf.browser.fromPixels(canvas);
-        const predictions = await model.classify(imgTensor);
-        mapPredictionsToWasteCategory(predictions);
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+
+      // Classify the image using MobileNet
+      const predictions: Prediction[] = await model.classify(canvas);
+
+      // Map predictions to waste categories
+      mapPredictionsToWasteCategory(predictions);
+    } catch (err) {
+      console.error('Classification error:', err);
+      setError('Error analyzing image.');
+    } finally {
+      setLoading(false);
+    }
+  }, [model, cameraOpen]);
+
+  const mapPredictionsToWasteCategory = (predictions: Prediction[]) => {
+    const wasteCategories = {
+      'Plastic': ['plastic bag', 'wrapper', 'packet', 'bottle', 'container', 'plastic', 'cup'],
+      'Metal': ['tin can', 'aluminum can', 'can', 'metal', 'soda can'],
+      'Paper': ['paper', 'notebook', 'cardboard', 'box', 'magazine', 'envelope'],
+      'Glass': ['glass bottle', 'wine bottle', 'jar', 'glass'],
+      'Organic': ['banana', 'apple', 'orange', 'vegetable', 'fruit', 'food', 'leaf']
+    };
+
+    const sortedPredictions = predictions.sort((a, b) => b.probability - a.probability);
+
+    for (const prediction of sortedPredictions) {
+      const className = prediction.className.toLowerCase();
+      const probability = Math.round(prediction.probability * 100);
+
+      if (probability < 10) continue;
+
+      for (const [category, keywords] of Object.entries(wasteCategories)) {
+        if (keywords.some(keyword => className.includes(keyword))) {
+          setResult(`**${category}** (Confidence: ${probability}%)`);
+          return;
+        }
       }
     }
+
+    const topConfidence = Math.round(sortedPredictions[0]?.probability * 100) || 0;
+    setResult(`**Other/Unknown** (Top: ${sortedPredictions[0]?.className || 'N/A'} - ${topConfidence}%)`);
   };
 
-  const mapPredictionsToWasteCategory = (predictions: { className: string; probability: number }[]) => {
-    const plasticKeywords = ['plastic bag', 'wrapper', 'packet'];
-    const metalKeywords = ['tin can', 'aluminum can', 'can'];
-    const paperKeywords = ['paper', 'notebook', 'cardboard'];
-    const glassKeywords = ['glass bottle', 'wine bottle'];
-
-    for (const prediction of predictions) {
-      const className = prediction.className.toLowerCase();
-      if (plasticKeywords.some(keyword => className.includes(keyword))) {
-        setResult('Plastic Waste');
-        return;
-      }
-      if (metalKeywords.some(keyword => className.includes(keyword))) {
-        setResult('Metal Waste');
-        return;
-      }
-      if (paperKeywords.some(keyword => className.includes(keyword))) {
-        setResult('Paper Waste');
-        return;
-      }
-      if (glassKeywords.some(keyword => className.includes(keyword))) {
-        setResult('Glass Waste');
-        return;
-      }
+  const stopCamera = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
+      tracks.forEach(track => track.stop());
+      setCameraOpen(false);
+      setResult(null);
     }
-    setResult('Other/Unknown');
   };
 
   return (
-    <div style={{ textAlign: 'center', marginTop: '20px' }}>
-      {!cameraOpen ? (
-        <button onClick={openCamera} style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer' }}>
-          Scan
-        </button>
-      ) : (
-        <div>
-          <video ref={videoRef} autoPlay style={{ width: '100%', maxWidth: '500px', borderRadius: '10px' }} />
-          <canvas ref={canvasRef} style={{ display: 'none' }} />
-          <button onClick={classifyImage} style={{ padding: '10px 20px', fontSize: '16px', cursor: 'pointer', marginTop: '10px' }}>
-            Scan the Image
+    <div className="waste-classifier-card bg-white shadow-xl rounded-xl p-6 w-full max-w-lg mx-auto border border-gray-100">
+      <h3 className="text-2xl font-bold mb-4 text-gray-800 text-center">♻️ Waste Sorter AI</h3>
+
+      <div className="relative aspect-video bg-gray-200 rounded-lg overflow-hidden mb-4 flex items-center justify-center min-h-[300px]">
+        {loading && <p className="text-blue-600 font-semibold">Loading AI Model...</p>}
+        {error && !loading && (
+          <div className="flex items-center gap-2 text-red-600 font-semibold p-4 text-center">
+            <AlertCircle size={20} />
+            <p>{error}</p>
+          </div>
+        )}
+
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          className={`w-full h-full object-cover ${cameraOpen && !loading ? 'block' : 'hidden'}`}
+        />
+
+        {!cameraOpen && !loading && !error && (
+          <p className="text-gray-500 text-center">Click "Open Camera" to start scanning waste.</p>
+        )}
+      </div>
+
+      <canvas ref={canvasRef} style={{ display: 'none' }} />
+
+      <div className="flex justify-center gap-4 mt-6 flex-wrap">
+        {!cameraOpen ? (
+          <button
+            onClick={openCamera}
+            disabled={loading || !model}
+            className="bg-green-500 hover:bg-green-600 disabled:opacity-50 text-white font-semibold py-3 px-6 rounded-full transition duration-300 flex items-center gap-2"
+          >
+            <Camera size={20} /> Open Camera
           </button>
+        ) : (
+          <>
+            <button
+              onClick={classifyImage}
+              disabled={loading || !model}
+              className="bg-blue-500 hover:bg-blue-600 disabled:opacity-50 text-white font-semibold py-3 px-6 rounded-full transition duration-300"
+            >
+              {loading ? 'Scanning...' : '📸 Scan Item'}
+            </button>
+            <button
+              onClick={stopCamera}
+              className="bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-full transition duration-300"
+            >
+              Stop
+            </button>
+          </>
+        )}
+      </div>
+
+      {result && (
+        <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
+          <div className="flex items-center gap-2 mb-2">
+            <CheckCircle size={20} className="text-green-600" />
+            <p className="text-lg font-medium text-gray-800">
+              AI Prediction: <span className="font-bold text-green-700" dangerouslySetInnerHTML={{ __html: result }}></span>
+            </p>
+          </div>
+          <p className="text-sm text-gray-600">
+            (Real MobileNet classification - works best with clear, well-lit images)
+          </p>
         </div>
       )}
-      {loading && <p>Loading model...</p>}
-      {result && <p>Prediction: {result}</p>}
     </div>
   );
 };
-
-// --- COMPONENTS ---
 
 // 1. Hero Section
 const Hero = () => {
@@ -240,7 +375,6 @@ const Hero = () => {
     </section>
   );
 };
-
 // Shared animation wrapper
 const FadeInCard = ({
   children,
