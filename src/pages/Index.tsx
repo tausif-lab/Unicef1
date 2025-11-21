@@ -22,6 +22,7 @@ import {
   AlertCircle,
   RotateCcw,
   
+  
 } from 'lucide-react';
 
 // --- UTILITY: INTERSECTION OBSERVER HOOK ---
@@ -78,6 +79,8 @@ const WasteClassifier: React.FC = () => {
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const wasteClassifierRef = useRef<HTMLDivElement>(null);
+  
 
   // Load scripts and model - single combined effect
   useEffect(() => {
@@ -252,8 +255,11 @@ const WasteClassifier: React.FC = () => {
     }
   };
 
-  return (
-    <div className="waste-classifier-card bg-white shadow-xl rounded-xl p-6 w-full max-w-lg mx-auto border border-gray-100">
+  /*return (
+    <div 
+    ref={wasteClassifierRef}
+    id="WasteClassifier"
+    className="waste-classifier-card bg-white shadow-xl rounded-xl p-6 w-full max-w-lg mx-auto border border-gray-100">
       <h3 className="text-2xl font-bold mb-4 text-gray-800 text-center">♻️ Waste Sorter AI</h3>
 
       <div className="relative aspect-video bg-gray-200 rounded-lg overflow-hidden mb-4 flex items-center justify-center min-h-[300px]">
@@ -273,7 +279,7 @@ const WasteClassifier: React.FC = () => {
         />
 
         {!cameraOpen && !loading && !error && (
-          <p className="text-gray-500 text-center">Click "Open Camera" to start scanning waste.</p>
+          <p className="text-gray-500 text-center">Click "Open Camera" .</p>
         )}
       </div>
 
@@ -321,8 +327,160 @@ const WasteClassifier: React.FC = () => {
         </div>
       )}
     </div>
-  );
+  );*/
+return (
+  <div 
+    ref={wasteClassifierRef}
+    id="WasteClassifier"
+    className="waste-classifier-card bg-gradient-to-br from-white to-green-50 shadow-2xl rounded-2xl p-8 w-full max-w-2xl mx-auto border-2 border-green-100"
+  >
+    {/* Header */}
+    <div className="text-center mb-6">
+      <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full mb-4 shadow-lg">
+        <span className="text-3xl">♻️</span>
+      </div>
+      <h3 className="text-3xl font-bold text-gray-800 mb-2">AI Waste Classifier</h3>
+      <p className="text-gray-600">Scan any waste item to identify its type and recycling category</p>
+    </div>
+
+    {/* Video/Camera Display */}
+    <div className="relative aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden mb-6 shadow-inner">
+      <div className="absolute inset-0 flex items-center justify-center">
+        {loading && !cameraOpen && (
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-16 h-16 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+            <p className="text-green-600 font-semibold text-lg">Loading AI Model...</p>
+          </div>
+        )}
+        
+        {error && !loading && (
+          <div className="flex flex-col items-center gap-3 text-red-600 p-6 text-center max-w-md">
+            <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center">
+              <AlertCircle size={28} />
+            </div>
+            <p className="font-semibold text-lg">{error}</p>
+            <button 
+              onClick={() => setError(null)}
+              className="mt-2 text-sm text-red-600 hover:text-red-700 underline"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
+
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          className={`w-full h-full object-cover ${cameraOpen && !loading ? 'block' : 'hidden'}`}
+        />
+
+        {!cameraOpen && !loading && !error && (
+          <div className="flex flex-col items-center gap-4 p-8 text-center">
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
+              <Camera size={40} className="text-green-600" />
+            </div>
+            <p className="text-gray-600 text-lg font-medium">Ready to scan waste items</p>
+            <p className="text-gray-500 text-sm">Click "Open Camera" below to start</p>
+          </div>
+        )}
+      </div>
+      
+      {/* Camera overlay indicator */}
+      {cameraOpen && !loading && (
+        <div className="absolute top-4 right-4 flex items-center gap-2 bg-red-500 text-white px-3 py-1.5 rounded-full text-sm font-semibold shadow-lg">
+          <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+          LIVE
+        </div>
+      )}
+    </div>
+
+    <canvas ref={canvasRef} style={{ display: 'none' }} />
+
+    {/* Action Buttons */}
+    <div className="flex justify-center gap-4 mb-6 flex-wrap">
+      {!cameraOpen ? (
+        <button
+          onClick={openCamera}
+          disabled={loading || !model}
+          className="group bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 px-8 rounded-full transition-all duration-300 flex items-center gap-3 shadow-lg hover:shadow-xl hover:scale-105 transform"
+        >
+          <Camera size={22} className="group-hover:rotate-12 transition-transform" />
+          <span className="text-lg">Open Camera</span>
+        </button>
+      ) : (
+        <>
+          <button
+            onClick={classifyImage}
+            disabled={loading || !model}
+            className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 text-white font-bold py-4 px-8 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 transform flex items-center gap-2"
+          >
+            {loading ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span>Analyzing...</span>
+              </>
+            ) : (
+              <>
+                <span className="text-xl">📸</span>
+                <span>Capture & Scan</span>
+              </>
+            )}
+          </button>
+          <button
+            onClick={stopCamera}
+            className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold py-4 px-8 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 transform"
+          >
+            ✕ Close Camera
+          </button>
+        </>
+      )}
+    </div>
+
+    {/* Result Display */}
+    {result && (
+      <div className="mt-6 p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl border-2 border-green-200 shadow-lg animate-fadeIn">
+        <div className="flex items-start gap-4">
+          <div className="flex-shrink-0 w-12 h-12 bg-green-500 rounded-full flex items-center justify-center shadow-md">
+            <CheckCircle size={24} className="text-white" />
+          </div>
+          <div className="flex-1">
+            <h4 className="text-lg font-bold text-gray-800 mb-2">Classification Result</h4>
+            <p className="text-xl font-semibold text-green-700 mb-3" dangerouslySetInnerHTML={{ __html: result }}></p>
+            <div className="flex items-center gap-2 text-sm text-gray-600 bg-white/60 rounded-lg px-3 py-2">
+              <span className="text-lg">💡</span>
+              <span>Real MobileNet AI - Works best with clear, well-lit images</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+
+    {/* Info Section */}
+    {!result && !cameraOpen && !loading && !error && (
+      <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
+        <div className="flex items-start gap-3">
+          <span className="text-2xl">ℹ️</span>
+          <div>
+            <h4 className="font-semibold text-blue-900 mb-1">How it works:</h4>
+            <ul className="text-sm text-blue-800 space-y-1">
+              <li>• Open camera and point at waste item</li>
+              <li>• Capture image for AI analysis</li>
+              <li>• Get instant classification and recycling info</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    )}
+  </div>
+);
+
+
+
+
 };
+
+
 
 // 1. Hero Section
 const Hero = () => {
@@ -338,6 +496,17 @@ const Hero = () => {
   }, [handleScroll]);
 
   const parallaxOffset = scrollY * 0.2;
+  /*const scrollToClassifier = () => {
+  if (wasteClassifierRef.current) {
+    wasteClassifierRef.current.scrollIntoView({ behavior: "smooth" });
+  }
+};*/
+const scrollToClassifier = () => {
+    const classifierElement = document.getElementById('WasteClassifier');
+    if (classifierElement) {
+      classifierElement.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   return (
     <section className="relative h-[80vh] overflow-hidden bg-gradient-to-br from-green-500/10 to-blue-500/10">
@@ -359,21 +528,36 @@ const Hero = () => {
             Sustainable Future
           </span>
         </h5>
+         <div className="mt-10 flex flex-col sm:flex-row gap-4 sm:gap-6">
+            <button
+              
+             onClick ={scrollToClassifier}
 
+              className="group relative inline-flex items-center gap-2 px-8 py-4 text-lg font-semibold rounded-full bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed" 
+            >
+              <Camera size={22} />
+              Scan Waste
+            </button>
+
+            <button className="group relative inline-flex items-center gap-2 px-8 py-4 text-lg font-semibold rounded-full border-2 border-green-500 text-green-600 hover:bg-green-50 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
+              🛍️ Shopping
+            </button>
+          </div>
         <p className="mt-4 text-xl font-medium text-white-200 md:text-2xl"> {/* Subheadline color improved */}
           Scan. Sort. Earn. Strengthen local communities through circular recycling.
         </p>
 
-        <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:gap-6">
+       {/*<div className="mt-10 flex flex-col gap-4 sm:flex-row sm:gap-6">
           <WasteClassifier />
           <button className="rounded-full border border-white px-8 py-3 text-lg font-semibold text-white transition-all duration-300 hover:bg-white hover:text-green-600">
             Learn More
           </button>
-        </div>
+        </div>*/}
 
       </div>
     </section>
   );
+  
 };
 // Shared animation wrapper
 const FadeInCard = ({
@@ -886,6 +1070,12 @@ const EnvironmentalLandingPage = () => {
 
         <section id="reviews">
           <Reviews />
+        </section>
+
+        <section id="scanner" className="py-20 bg-gray-50">
+          <div className="container mx-auto px-6">
+            <WasteClassifier />
+          </div>
         </section>
       </main>
 
