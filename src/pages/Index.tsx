@@ -219,12 +219,38 @@ const WasteClassifier: React.FC = () => {
 
   const mapPredictionsToWasteCategory = (predictions: Prediction[]) => {
     const wasteCategories = {
-      'Plastic': ['plastic bag', 'wrapper', 'packet', 'bottle', 'container', 'plastic', 'cup'],
-      'Metal': ['tin can', 'aluminum can', 'can', 'metal', 'soda can'],
-      'Paper': ['paper', 'notebook', 'cardboard', 'box', 'magazine', 'envelope'],
-      'Glass': ['glass bottle', 'wine bottle', 'jar', 'glass'],
-      'Organic': ['banana', 'apple', 'orange', 'vegetable', 'fruit', 'food', 'leaf']
-    };
+  Plastic_PET: [
+    'water bottle', 'juice bottle', 'beverage bottle', 'bottle'
+  ],
+
+  Plastic_Flexible: [
+    'wrapper', 'packet', 'bag', 'pouch', 'plastic bag'
+  ],
+
+  Plastic_Rigid: [
+    'container', 'shampoo', 'lotion', 'dispenser', 'soap', 'detergent'
+  ],
+
+  Plastic_Cutlery: [
+    'cup', 'spoon', 'fork', 'mug', 'utensil'
+  ],
+
+  Metal: [
+    'can', 'tin', 'aluminum', 'metal', 'soda can', 'beer can'
+  ],
+
+  Paper: [
+    'paper', 'notebook', 'cardboard', 'magazine', 'newspaper', 'envelope', 'carton'
+  ],
+
+  Glass: [
+    'glass', 'jar', 'glass bottle', 'wine bottle'
+  ],
+
+  
+};
+
+
 
     const sortedPredictions = predictions.sort((a, b) => b.probability - a.probability);
 
