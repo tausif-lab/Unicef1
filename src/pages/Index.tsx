@@ -4,7 +4,9 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import workflow from '../assets/workflow-bg.jpg'
 import { cn } from "../lib/utils";
 import { TestimonialCard, type TestimonialAuthor } from "../components/ui/testimonial-card";
-
+import { useScanTimer } from '../hooks/useScanTimer';
+import { QRScanner } from '../components/QRScanner';
+import { parseBinCategory, getCategoryDisplayName } from '../utils/qrParser';
 
 import {
   Leaf,
@@ -70,7 +72,7 @@ interface Prediction {
 
  
 
-const WasteClassifier: React.FC = () => {
+/*const WasteClassifier: React.FC = () => {
   const [model, setModel] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [result, setResult] = useState<string | null>(null);
@@ -281,86 +283,14 @@ const WasteClassifier: React.FC = () => {
     }
   };
 
-  /*return (
-    <div 
-    ref={wasteClassifierRef}
-    id="WasteClassifier"
-    className="waste-classifier-card bg-white shadow-xl rounded-xl p-6 w-full max-w-lg mx-auto border border-gray-100">
-      <h3 className="text-2xl font-bold mb-4 text-gray-800 text-center">♻️ Waste Sorter AI</h3>
-
-      <div className="relative aspect-video bg-gray-200 rounded-lg overflow-hidden mb-4 flex items-center justify-center min-h-[300px]">
-        {loading && <p className="text-blue-600 font-semibold">Loading AI Model...</p>}
-        {error && !loading && (
-          <div className="flex items-center gap-2 text-red-600 font-semibold p-4 text-center">
-            <AlertCircle size={20} />
-            <p>{error}</p>
-          </div>
-        )}
-
-        <video
-          ref={videoRef}
-          autoPlay
-          playsInline
-          className={`w-full h-full object-cover ${cameraOpen && !loading ? 'block' : 'hidden'}`}
-        />
-
-        {!cameraOpen && !loading && !error && (
-          <p className="text-gray-500 text-center">Click "Open Camera" .</p>
-        )}
-      </div>
-
-      <canvas ref={canvasRef} style={{ display: 'none' }} />
-
-      <div className="flex justify-center gap-4 mt-6 flex-wrap">
-        {!cameraOpen ? (
-          <button
-            onClick={openCamera}
-            disabled={loading || !model}
-            className="bg-green-500 hover:bg-green-600 disabled:opacity-50 text-white font-semibold py-3 px-6 rounded-full transition duration-300 flex items-center gap-2"
-          >
-            <Camera size={20} /> Open Camera
-          </button>
-        ) : (
-          <>
-            <button
-              onClick={classifyImage}
-              disabled={loading || !model}
-              className="bg-blue-500 hover:bg-blue-600 disabled:opacity-50 text-white font-semibold py-3 px-6 rounded-full transition duration-300"
-            >
-              {loading ? 'Scanning...' : '📸 Scan Item'}
-            </button>
-            <button
-              onClick={stopCamera}
-              className="bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-6 rounded-full transition duration-300"
-            >
-              Stop
-            </button>
-          </>
-        )}
-      </div>
-
-      {result && (
-        <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
-          <div className="flex items-center gap-2 mb-2">
-            <CheckCircle size={20} className="text-green-600" />
-            <p className="text-lg font-medium text-gray-800">
-              AI Prediction: <span className="font-bold text-green-700" dangerouslySetInnerHTML={{ __html: result }}></span>
-            </p>
-          </div>
-          <p className="text-sm text-gray-600">
-            (Real MobileNet classification - works best with clear, well-lit images)
-          </p>
-        </div>
-      )}
-    </div>
-  );*/
+  
 return (
   <div 
     ref={wasteClassifierRef}
     id="WasteClassifier"
     className="waste-classifier-card bg-gradient-to-br from-white to-green-50 shadow-2xl rounded-2xl p-8 w-full max-w-2xl mx-auto border-2 border-green-100"
   >
-    {/* Header */}
+    {/* Header *}
     <div className="text-center mb-6">
       <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full mb-4 shadow-lg">
         <span className="text-3xl">♻️</span>
@@ -369,7 +299,7 @@ return (
       <p className="text-gray-600">Scan any waste item to identify its type and recycling category</p>
     </div>
 
-    {/* Video/Camera Display */}
+    {/* Video/Camera Display *}
     <div className="relative aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden mb-6 shadow-inner">
       <div className="absolute inset-0 flex items-center justify-center">
         {loading && !cameraOpen && (
@@ -412,7 +342,7 @@ return (
         )}
       </div>
       
-      {/* Camera overlay indicator */}
+      {/* Camera overlay indicator *}
       {cameraOpen && !loading && (
         <div className="absolute top-4 right-4 flex items-center gap-2 bg-red-500 text-white px-3 py-1.5 rounded-full text-sm font-semibold shadow-lg">
           <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
@@ -423,7 +353,7 @@ return (
 
     <canvas ref={canvasRef} style={{ display: 'none' }} />
 
-    {/* Action Buttons */}
+    {/* Action Buttons *}
     <div className="flex justify-center gap-4 mb-6 flex-wrap">
       {!cameraOpen ? (
         <button
@@ -463,7 +393,7 @@ return (
       )}
     </div>
 
-    {/* Result Display */}
+    {/* Result Display *}
     {result && (
       <div className="mt-6 p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl border-2 border-green-200 shadow-lg animate-fadeIn">
         <div className="flex items-start gap-4">
@@ -482,7 +412,7 @@ return (
       </div>
     )}
 
-    {/* Info Section */}
+    {/* Info Section *}
     {!result && !cameraOpen && !loading && !error && (
       <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
         <div className="flex items-start gap-3">
@@ -504,6 +434,434 @@ return (
 
 
 
+};*/
+const WasteClassifier: React.FC = () => {
+  const [model, setModel] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [result, setResult] = useState<string | null>(null);
+  const [detectedCategory, setDetectedCategory] = useState<string | null>(null);
+  const [cameraOpen, setCameraOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [points, setPoints] = useState<number>(0);
+  const [scanMessage, setScanMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+  const { timeLeft, isActive, startTimer, resetTimer } = useScanTimer(30);
+
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Load points from localStorage on mount
+  useEffect(() => {
+    const savedPoints = localStorage.getItem('ecoPoints');
+    if (savedPoints) {
+      setPoints(JSON.parse(savedPoints));
+    }
+  }, []);
+
+  // Save points to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('ecoPoints', JSON.stringify(points));
+  }, [points]);
+
+  // Load scripts and model - keep existing useEffect
+  useEffect(() => {
+    const initializeModel = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        if (!(window as any).tf) {
+          await new Promise<void>((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0';
+            script.async = true;
+            script.onload = () => resolve();
+            script.onerror = () => reject(new Error('Failed to load TensorFlow'));
+            document.head.appendChild(script);
+          });
+        }
+
+        if (!(window as any).mobilenet) {
+          await new Promise<void>((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0';
+            script.async = true;
+            script.onload = () => resolve();
+            script.onerror = () => reject(new Error('Failed to load MobileNet'));
+            document.head.appendChild(script);
+          });
+        }
+
+        const tf = (window as any).tf;
+        const mobilenet = (window as any).mobilenet;
+
+        if (!tf || !mobilenet) {
+          throw new Error('TensorFlow or MobileNet not available');
+        }
+
+        console.log('Loading MobileNet model...');
+        const loadedModel = await mobilenet.load();
+        setModel(loadedModel);
+        console.log('MobileNet Model Loaded Successfully!');
+        setLoading(false);
+      } catch (err) {
+        console.error('Error initializing model:', err);
+        setError('Failed to load AI model. Please refresh the page.');
+        setLoading(false);
+      }
+    };
+
+    initializeModel();
+  }, []);
+
+  const openCamera = useCallback(async () => {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setError('Camera access is not supported by your browser.');
+      return;
+    }
+
+    setError(null);
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: 'environment',
+          width: { ideal: 640 },
+          height: { ideal: 480 }
+        }
+      });
+
+      if (videoRef.current) {
+        const video = videoRef.current;
+        video.srcObject = stream;
+
+        try {
+          if (video.readyState >= 1) {
+            await video.play().catch(() => {});
+          } else {
+            await new Promise<void>((resolve) => {
+              const onLoaded = () => {
+                video.play().finally(() => resolve());
+              };
+              video.addEventListener('loadedmetadata', onLoaded, { once: true });
+            });
+          }
+        } catch (err) {
+          console.warn('Error starting video:', err);
+        }
+
+        setCameraOpen(true);
+        setResult(null);
+        setDetectedCategory(null);
+        resetTimer();
+        setScanMessage(null);
+      }
+    } catch (err) {
+      console.error('Error opening camera:', err);
+      setError('Could not open camera. Please check permissions.');
+    }
+  }, [resetTimer]);
+
+  const classifyImage = useCallback(async () => {
+    if (!model || !videoRef.current || !canvasRef.current || !cameraOpen) {
+      setError('Camera or model not ready.');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      const context = canvas.getContext('2d');
+
+      if (!context) {
+        setError('Could not get canvas context.');
+        setLoading(false);
+        return;
+      }
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+
+      const predictions: Prediction[] = await model.classify(canvas);
+      mapPredictionsToWasteCategory(predictions);
+    } catch (err) {
+      console.error('Classification error:', err);
+      setError('Error analyzing image.');
+    } finally {
+      setLoading(false);
+    }
+  }, [model, cameraOpen]);
+
+  const mapPredictionsToWasteCategory = (predictions: Prediction[]) => {
+    const wasteCategories = {
+      Plastic_PET: ['water bottle', 'juice bottle', 'beverage bottle', 'bottle'],
+      Plastic_Flexible: ['wrapper', 'packet', 'bag', 'pouch', 'plastic bag'],
+      Plastic_Rigid: ['container', 'shampoo', 'lotion', 'dispenser', 'soap', 'detergent'],
+      Plastic_Cutlery: ['cup', 'spoon', 'fork', 'mug', 'utensil'],
+      Metal: ['can', 'tin', 'aluminum', 'metal', 'soda can', 'beer can'],
+      Paper: ['paper', 'notebook', 'cardboard', 'magazine', 'newspaper', 'envelope', 'carton'],
+      Glass: ['glass', 'jar', 'glass bottle', 'wine bottle'],
+    };
+
+    const sortedPredictions = predictions.sort((a, b) => b.probability - a.probability);
+
+    for (const prediction of sortedPredictions) {
+      const className = prediction.className.toLowerCase();
+      const probability = Math.round(prediction.probability * 100);
+
+      if (probability < 10) continue;
+
+      for (const [category, keywords] of Object.entries(wasteCategories)) {
+        if (keywords.some(keyword => className.includes(keyword))) {
+          setResult(`**${category}** (Confidence: ${probability}%)`);
+          setDetectedCategory(category);
+          startTimer();
+          setScanMessage(null);
+          return;
+        }
+      }
+    }
+
+    const topConfidence = Math.round(sortedPredictions[0]?.probability * 100) || 0;
+    setResult(`**Other/Unknown** (Top: ${sortedPredictions[0]?.className || 'N/A'} - ${topConfidence}%)`);
+    setDetectedCategory(null);
+  };
+
+  const handleQRScan = (qrText: string) => {
+    if (!isActive || timeLeft === 0) {
+      setScanMessage({ type: 'error', text: 'Time expired! Please classify waste again.' });
+      return;
+    }
+
+    if (!detectedCategory) {
+      setScanMessage({ type: 'error', text: 'No waste detected. Please classify first.' });
+      return;
+    }
+
+    const scannedCategory = parseBinCategory(qrText);
+
+    if (!scannedCategory) {
+      setScanMessage({ type: 'error', text: 'Invalid QR code. Please scan a valid bin QR.' });
+      return;
+    }
+
+    if (scannedCategory === detectedCategory) {
+      const pointsEarned = 10;
+      setPoints(prev => prev + pointsEarned);
+      setScanMessage({ 
+        type: 'success', 
+        text: `✓ Correct bin! +${pointsEarned} points earned!` 
+      });
+      resetTimer();
+    } else {
+      setScanMessage({ 
+        type: 'error', 
+        text: `✗ Wrong bin! Expected ${getCategoryDisplayName(detectedCategory)}, scanned ${getCategoryDisplayName(scannedCategory)}` 
+      });
+    }
+  };
+
+  const stopCamera = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
+      tracks.forEach(track => track.stop());
+      setCameraOpen(false);
+      setResult(null);
+      setDetectedCategory(null);
+      resetTimer();
+      setScanMessage(null);
+    }
+  };
+
+  return (
+    <div 
+      id="WasteClassifier"
+      className="waste-classifier-card bg-gradient-to-br from-white to-green-50 shadow-2xl rounded-2xl p-8 w-full max-w-2xl mx-auto border-2 border-green-100"
+    >
+      {/* Points Display */}
+      <div className="absolute top-4 right-4 bg-gradient-to-r from-yellow-400 to-yellow-500 text-white px-4 py-2 rounded-full font-bold shadow-lg">
+        🏆 {points} Points
+      </div>
+
+      {/* Header - keep existing */}
+      <div className="text-center mb-6">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-full mb-4 shadow-lg">
+          <span className="text-3xl">♻️</span>
+        </div>
+        <h3 className="text-3xl font-bold text-gray-800 mb-2">AI Waste Classifier</h3>
+        <p className="text-gray-600">Scan any waste item to identify its type and recycling category</p>
+      </div>
+
+      {/* Video/Camera Display - keep existing */}
+      <div className="relative aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden mb-6 shadow-inner">
+        <div className="absolute inset-0 flex items-center justify-center">
+          {loading && !cameraOpen && (
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-16 h-16 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+              <p className="text-green-600 font-semibold text-lg">Loading AI Model...</p>
+            </div>
+          )}
+          
+          {error && !loading && (
+            <div className="flex flex-col items-center gap-3 text-red-600 p-6 text-center max-w-md">
+              <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center">
+                <AlertCircle size={28} />
+              </div>
+              <p className="font-semibold text-lg">{error}</p>
+              <button 
+                onClick={() => setError(null)}
+                className="mt-2 text-sm text-red-600 hover:text-red-700 underline"
+              >
+                Dismiss
+              </button>
+            </div>
+          )}
+
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            className={`w-full h-full object-cover ${cameraOpen && !loading ? 'block' : 'hidden'}`}
+          />
+
+          {!cameraOpen && !loading && !error && (
+            <div className="flex flex-col items-center gap-4 p-8 text-center">
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
+                <Camera size={40} className="text-green-600" />
+              </div>
+              <p className="text-gray-600 text-lg font-medium">Ready to scan waste items</p>
+              <p className="text-gray-500 text-sm">Click "Open Camera" below to start</p>
+            </div>
+          )}
+        </div>
+        
+        {cameraOpen && !loading && (
+          <div className="absolute top-4 right-4 flex items-center gap-2 bg-red-500 text-white px-3 py-1.5 rounded-full text-sm font-semibold shadow-lg">
+            <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+            LIVE
+          </div>
+        )}
+      </div>
+
+      <canvas ref={canvasRef} style={{ display: 'none' }} />
+
+      {/* Action Buttons - keep existing */}
+      <div className="flex justify-center gap-4 mb-6 flex-wrap">
+        {!cameraOpen ? (
+          <button
+            onClick={openCamera}
+            disabled={loading || !model}
+            className="group bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 px-8 rounded-full transition-all duration-300 flex items-center gap-3 shadow-lg hover:shadow-xl hover:scale-105 transform"
+          >
+            <Camera size={22} className="group-hover:rotate-12 transition-transform" />
+            <span className="text-lg">Open Camera</span>
+          </button>
+        ) : (
+          <>
+            <button
+              onClick={classifyImage}
+              disabled={loading || !model}
+              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 text-white font-bold py-4 px-8 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 transform flex items-center gap-2"
+            >
+              {loading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Analyzing...</span>
+                </>
+              ) : (
+                <>
+                  <span className="text-xl">📸</span>
+                  <span>Capture & Scan</span>
+                </>
+              )}
+            </button>
+            <button
+              onClick={stopCamera}
+              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold py-4 px-8 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 transform"
+            >
+              ✕ Close Camera
+            </button>
+          </>
+        )}
+      </div>
+
+      {/* Timer Display */}
+      {isActive && timeLeft > 0 && (
+        <div className="mb-6 p-4 bg-blue-50 border-2 border-blue-200 rounded-xl text-center animate-pulse">
+          <p className="text-2xl font-bold text-blue-700">
+            ⏱️ {timeLeft}s remaining
+          </p>
+          <p className="text-sm text-blue-600 mt-1">Scan the correct bin QR to earn points!</p>
+        </div>
+      )}
+
+      {/* Classification Result */}
+      {result && (
+        <div className="mt-6 p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl border-2 border-green-200 shadow-lg animate-fadeIn">
+          <div className="flex items-start gap-4">
+            <div className="flex-shrink-0 w-12 h-12 bg-green-500 rounded-full flex items-center justify-center shadow-md">
+              <CheckCircle size={24} className="text-white" />
+            </div>
+            <div className="flex-1">
+              <h4 className="text-lg font-bold text-gray-800 mb-2">Classification Result</h4>
+              <p className="text-xl font-semibold text-green-700 mb-3" dangerouslySetInnerHTML={{ __html: result }}></p>
+              {detectedCategory && (
+                <div className="mt-4 p-3 bg-white rounded-lg border border-green-300">
+                  <p className="text-sm font-semibold text-gray-700 mb-2">
+                    ✓ Required Bin: {getCategoryDisplayName(detectedCategory)}
+                  </p>
+                  {isActive && (
+                    <p className="text-xs text-gray-600">
+                      Scan the corresponding bin QR within {timeLeft}s to earn points
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* QR Scanner */}
+      {detectedCategory && (
+        <div className="mt-6">
+          <QRScanner onScan={handleQRScan} isActive={isActive} />
+        </div>
+      )}
+
+      {/* Scan Message */}
+      {scanMessage && (
+        <div className={`mt-4 p-4 rounded-lg border-2 ${
+          scanMessage.type === 'success' 
+            ? 'bg-green-50 border-green-300 text-green-800' 
+            : 'bg-red-50 border-red-300 text-red-800'
+        }`}>
+          <p className="font-semibold text-center">{scanMessage.text}</p>
+        </div>
+      )}
+
+      {/* Info Section - keep existing */}
+      {!result && !cameraOpen && !loading && !error && (
+        <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">ℹ️</span>
+            <div>
+              <h4 className="font-semibold text-blue-900 mb-1">How it works:</h4>
+              <ul className="text-sm text-blue-800 space-y-1">
+                <li>• Open camera and point at waste item</li>
+                <li>• Capture image for AI analysis</li>
+                <li>• Scan the correct bin QR within 30 seconds</li>
+                <li>• Earn 10 points for correct bin selection!</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 
@@ -573,13 +931,7 @@ const scrollToClassifier = () => {
           Scan. Sort. Earn. Strengthen local communities through circular recycling.
         </p>
 
-       {/*<div className="mt-10 flex flex-col gap-4 sm:flex-row sm:gap-6">
-          <WasteClassifier />
-          <button className="rounded-full border border-white px-8 py-3 text-lg font-semibold text-white transition-all duration-300 hover:bg-white hover:text-green-600">
-            Learn More
-          </button>
-        </div>*/}
-
+      
       </div>
     </section>
   );
