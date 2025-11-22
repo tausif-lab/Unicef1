@@ -10,10 +10,38 @@ export const parseBinCategory = (qrText: string): string | null => {
     'ORGANIC_BIN': 'Organic'
   };
 
-  const normalized = qrText.trim().toUpperCase();
-  return binMapping[normalized] || null;
+  // Clean the QR text - remove whitespace, newlines, and convert to uppercase
+  const normalized = qrText.trim().toUpperCase().replace(/[\n\r\s]/g, '');
+  
+  // Try direct match first
+  if (binMapping[normalized]) {
+    return binMapping[normalized];
+  }
+  
+  // If QR contains a URL, try to extract the bin name from it
+  if (normalized.includes('HTTP') || normalized.includes('WWW')) {
+    // Try to find bin name in URL
+    for (const binName of Object.keys(binMapping)) {
+      if (normalized.includes(binName)) {
+        return binMapping[binName];
+      }
+    }
+  }
+  
+  // Try partial matching (if QR text contains the bin name anywhere)
+  for (const [binName, category] of Object.entries(binMapping)) {
+    if (normalized.includes(binName)) {
+      return category;
+    }
+  }
+  
+  // Log for debugging
+  console.log('QR Text received:', qrText);
+  console.log('Normalized:', normalized);
+  
+  return null;
 };
 
 export const getCategoryDisplayName = (category: string): string => {
-  return category.replace('_', ' - ');
+  return category.replace(/_/g, ' - '); // Changed to replace ALL underscores
 };
