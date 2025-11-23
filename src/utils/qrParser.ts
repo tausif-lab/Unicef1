@@ -47,7 +47,7 @@ export const getCategoryDisplayName = (category: string): string => {
 };
 */
 
-// Normalize and clean QR text for comparison
+/*/ Normalize and clean QR text for comparison
 const normalizeText = (text: string): string => {
   return text
     .trim()                    // Remove leading/trailing whitespace
@@ -144,6 +144,53 @@ export const parseBinCategory = (qrText: string): string | null => {
 };
 
 export const getCategoryDisplayName = (category: string): string => {
+  return category.replace(/_/g, ' - ');
+};*/
+
+
+// utils/qrParser.ts
+
+export const parseBinCategory = (qrText: string): string | null => {
+  // 1. Normalize: Uppercase and remove all non-alphanumeric characters (keep basic text)
+  // We keep it simple: just uppercase for searching
+  const normalized = qrText.toUpperCase();
+
+  console.log('========== QR PARSER DEBUG ==========');
+  console.log('Raw QR Text:', qrText);
+  console.log('Normalized for search:', normalized);
+
+  // 2. Define Keywords to Category Map
+  // The key is the "Word to find in QR", the value is "Category ID matching Index.tsx"
+  const keywordMap: Record<string, string> = {
+    'PET': 'Plastic_PET',
+    'FLEXIBLE': 'Plastic_Flexible',
+    'RIGID': 'Plastic_Rigid',
+    'CUTLERY': 'Plastic_Cutlery',
+    'METAL': 'Metal',
+    'PAPER': 'Paper',
+    'GLASS': 'Glass',
+    'ORGANIC': 'Organic',
+    // Add common variations if needed
+    'BOTTLE': 'Plastic_PET',
+    'CAN': 'Metal'
+  };
+
+  // 3. Check if any keyword exists in the scanned text
+  for (const [keyword, category] of Object.entries(keywordMap)) {
+    if (normalized.includes(keyword)) {
+      console.log(`✓ Match found! Keyword: "${keyword}" -> Category: "${category}"`);
+      console.log('========== END PARSER DEBUG ==========');
+      return category;
+    }
+  }
+
+  console.log('✗ No known waste keywords found in QR text');
+  console.log('========== END PARSER DEBUG ==========');
+  return null;
+};
+
+export const getCategoryDisplayName = (category: string): string => {
+  if (!category) return 'Unknown';
   return category.replace(/_/g, ' - ');
 };
 

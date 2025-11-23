@@ -674,7 +674,10 @@ const WasteClassifier: React.FC = () => {
       });
     }
   };*/
-  const handleQRScan = (qrText: string) => {
+ 
+ 
+ 
+ /* const handleQRScan = (qrText: string) => {
   console.log('========== HANDLE QR SCAN ==========');
   console.log('1. Raw received text:', qrText);
   console.log('2. Text length:', qrText.length);
@@ -731,8 +734,53 @@ const WasteClassifier: React.FC = () => {
       text: `✗ Wrong bin! Expected ${getCategoryDisplayName(detectedCategory)}, but scanned ${getCategoryDisplayName(scannedCategory)}. Try again!` 
     });
   }
-};
+};*/
+// Inside Index.tsx component
 
+const handleQRScan = (qrText: string) => {
+  console.log('========== HANDLE QR SCAN ==========');
+  
+  if (!isActive || timeLeft === 0) {
+    setScanMessage({ type: 'error', text: 'Time expired! Please classify waste again.' });
+    return;
+  }
+
+  if (!detectedCategory) {
+    setScanMessage({ type: 'error', text: 'No waste detected. Please classify first.' });
+    return;
+  }
+
+  // 1. Parse the scanned text
+  const scannedCategory = parseBinCategory(qrText);
+  
+  console.log('Detected (AI):', detectedCategory);
+  console.log('Scanned (QR):', scannedCategory);
+
+  if (!scannedCategory) {
+    setScanMessage({ 
+      type: 'error', 
+      text: 'Invalid QR. Please scan a valid recycling bin.' 
+    });
+    return;
+  }
+
+  // 2. Compare directly (Strings should match exactly from the parser map)
+  if (scannedCategory === detectedCategory) {
+    const pointsEarned = 10;
+    setPoints(prev => prev + pointsEarned);
+    setScanMessage({ 
+      type: 'success', 
+      text: `✓ Correct! You scanned the ${getCategoryDisplayName(scannedCategory)} bin. +${pointsEarned} points!` 
+    });
+    resetTimer();
+  } else {
+    setScanMessage({ 
+      type: 'error', 
+      text: `✗ Wrong Bin! AI detected ${getCategoryDisplayName(detectedCategory)}, but you scanned ${getCategoryDisplayName(scannedCategory)}.` 
+    });
+  }
+  console.log('========== END HANDLE ==========');
+};
 
 
 
