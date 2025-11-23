@@ -45,3 +45,4 @@ export const parseBinCategory = (qrText: string): string | null => {
 export const getCategoryDisplayName = (category: string): string => {
   return category.replace(/_/g, ' - '); // Changed to replace ALL underscores
 };
+
