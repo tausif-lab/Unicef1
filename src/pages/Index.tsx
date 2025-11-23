@@ -629,7 +629,7 @@ const WasteClassifier: React.FC = () => {
     setResult(`**Other/Unknown** (Top: ${sortedPredictions[0]?.className || 'N/A'} - ${topConfidence}%)`);
     setDetectedCategory(null);
   };
-
+  /*
   const handleQRScan = (qrText: string) => {
     console.log('========== HANDLE QR SCAN ==========');
      console.log('1. Received QR text:', qrText);
@@ -673,7 +673,68 @@ const WasteClassifier: React.FC = () => {
         text: `✗ Wrong bin! Expected ${getCategoryDisplayName(detectedCategory)}, scanned ${getCategoryDisplayName(scannedCategory)}` 
       });
     }
-  };
+  };*/
+  const handleQRScan = (qrText: string) => {
+  console.log('========== HANDLE QR SCAN ==========');
+  console.log('1. Raw received text:', qrText);
+  console.log('2. Text length:', qrText.length);
+  console.log('3. Text bytes:', Array.from(qrText).map(c => `${c}(${c.charCodeAt(0)})`));
+  console.log('4. Current detected category:', detectedCategory);
+  
+  if (!isActive || timeLeft === 0) {
+    console.log('✗ Timer expired');
+    console.log('========== END HANDLE ==========');
+    setScanMessage({ type: 'error', text: 'Time expired! Please classify waste again.' });
+    return;
+  }
+
+  if (!detectedCategory) {
+    console.log('✗ No category detected');
+    console.log('========== END HANDLE ==========');
+    setScanMessage({ type: 'error', text: 'No waste detected. Please classify first.' });
+    return;
+  }
+
+  const scannedCategory = parseBinCategory(qrText);
+  console.log('5. Parsed category:', scannedCategory);
+  
+  if (!scannedCategory) {
+    console.log('✗ Invalid QR - no category match');
+    console.log('========== END HANDLE ==========');
+    setScanMessage({ 
+      type: 'error', 
+      text: `Invalid QR code. Scanned: "${qrText.substring(0, 20)}..." - Please scan a valid bin QR.` 
+    });
+    return;
+  }
+
+  // Normalize both categories for comparison
+  const normalizedScanned = scannedCategory.trim().toUpperCase().replace(/\s+/g, '');
+  const normalizedDetected = detectedCategory.trim().toUpperCase().replace(/\s+/g, '');
+  
+  console.log('6. Normalized scanned:', normalizedScanned);
+  console.log('7. Normalized detected:', normalizedDetected);
+  console.log('8. Match result:', normalizedScanned === normalizedDetected);
+  console.log('========== END HANDLE ==========');
+
+  if (normalizedScanned === normalizedDetected) {
+    const pointsEarned = 10;
+    setPoints(prev => prev + pointsEarned);
+    setScanMessage({ 
+      type: 'success', 
+      text: `✓ Correct bin! You scanned ${getCategoryDisplayName(scannedCategory)}. +${pointsEarned} points earned!` 
+    });
+    resetTimer();
+  } else {
+    setScanMessage({ 
+      type: 'error', 
+      text: `✗ Wrong bin! Expected ${getCategoryDisplayName(detectedCategory)}, but scanned ${getCategoryDisplayName(scannedCategory)}. Try again!` 
+    });
+  }
+};
+
+
+
 
   const stopCamera = () => {
     if (videoRef.current && videoRef.current.srcObject) {
