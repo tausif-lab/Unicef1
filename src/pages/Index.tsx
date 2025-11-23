@@ -631,7 +631,15 @@ const WasteClassifier: React.FC = () => {
   };
 
   const handleQRScan = (qrText: string) => {
-    if (!isActive || timeLeft === 0) {
+    console.log('========== HANDLE QR SCAN ==========');
+     console.log('1. Received QR text:', qrText);
+     console.log('2. QR text type:', typeof qrText);
+     console.log('3. QR text length:',   qrText.length);
+     console.log('4. Current detected category:', detectedCategory);
+  
+     
+     
+     if (!isActive || timeLeft === 0) {
       setScanMessage({ type: 'error', text: 'Time expired! Please classify waste again.' });
       return;
     }
@@ -642,6 +650,9 @@ const WasteClassifier: React.FC = () => {
     }
 
     const scannedCategory = parseBinCategory(qrText);
+     console.log('5. Parsed category result:', scannedCategory);
+      console.log('6. Match result:', scannedCategory === detectedCategory);
+     console.log('========== END HANDLE ==========');
 
     if (!scannedCategory) {
       setScanMessage({ type: 'error', text: 'Invalid QR code. Please scan a valid bin QR.' });
