@@ -59,7 +59,7 @@ const normalizeText = (text: string): string => {
 export const parseBinCategory = (qrText: string): string | null => {
   // Map with underscores (original format)
   const binMappingWithUnderscore: Record<string, string> = {
-    'PET_BIN': 'Plastic_PET',
+    'PETBIN': 'Plastic_PET',
     'FLEXIBLE_BIN': 'Plastic_Flexible',
     'RIGID_BIN': 'Plastic_Rigid',
     'CUTLERY_BIN': 'Plastic_Cutlery',
