@@ -111,10 +111,16 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onScan, isActive }) => {
             }
             
             if (code && code.data) {
-              setDebugInfo(`✓ QR Code found: ${code.data}`);
-              setScanError(null);
-              onScan(code.data);
-            } else {
+              console.log('========== QR DEBUG ==========');
+              console.log('Raw QR data:', code.data);
+              console.log('QR length:', code.data.length);
+              console.log('QR characters:', code.data.split('').map(c => `${c}(${c.charCodeAt(0)})`));
+               console.log('========== END DEBUG ==========');
+  
+               setDebugInfo(`✓ QR Code found: ${code.data}`);
+               setScanError(null);
+                onScan(code.data);
+               } else {
               setScanError('No QR code detected. Please ensure:\n• QR code is clearly visible\n• Image is well-lit\n• QR code takes up most of the image\n• Try taking photo from directly above');
               setDebugInfo('No QR pattern detected in image');
             }
