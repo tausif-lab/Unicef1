@@ -52,12 +52,25 @@ const normalizeText = (text: string): string => {
   return text
     .trim()                    // Remove leading/trailing whitespace
     .toUpperCase()             // Convert to uppercase
-    .replace(/[\s\n\r\t]+/g, '') // Remove ALL whitespace including newlines
-    .replace(/[^\w]/g, '');    // Remove special characters except underscore
+    .replace(/[\s\n\r\t]+/g, ''); // Remove ALL whitespace including newlines
+    // DON'T remove underscores yet - we'll handle both formats
 };
 
 export const parseBinCategory = (qrText: string): string | null => {
-  const binMapping: Record<string, string> = {
+  // Map with underscores (original format)
+  const binMappingWithUnderscore: Record<string, string> = {
+    'PET_BIN': 'Plastic_PET',
+    'FLEXIBLE_BIN': 'Plastic_Flexible',
+    'RIGID_BIN': 'Plastic_Rigid',
+    'CUTLERY_BIN': 'Plastic_Cutlery',
+    'METAL_BIN': 'Metal',
+    'PAPER_BIN': 'Paper',
+    'GLASS_BIN': 'Glass',
+    'ORGANIC_BIN': 'Organic'
+  };
+
+  // Map without underscores (normalized format)
+  const binMappingNoUnderscore: Record<string, string> = {
     'PETBIN': 'Plastic_PET',
     'FLEXIBLEBIN': 'Plastic_Flexible',
     'RIGIDBIN': 'Plastic_Rigid',
@@ -68,23 +81,33 @@ export const parseBinCategory = (qrText: string): string | null => {
     'ORGANICBIN': 'Organic'
   };
 
-  // Normalize the incoming QR text
+  // Normalize the incoming QR text (keep underscores)
   const normalized = normalizeText(qrText);
   
   console.log('========== QR PARSER DEBUG ==========');
   console.log('Raw QR text:', qrText);
-  console.log('Normalized:', normalized);
+  console.log('Normalized (with underscore):', normalized);
   console.log('Length:', normalized.length);
   
-  // Direct match after normalization
-  if (binMapping[normalized]) {
-    console.log('✓ Direct match found:', binMapping[normalized]);
+  // Try direct match with underscore first
+  if (binMappingWithUnderscore[normalized]) {
+    console.log('✓ Direct match (with underscore) found:', binMappingWithUnderscore[normalized]);
     console.log('========== END PARSER DEBUG ==========');
-    return binMapping[normalized];
+    return binMappingWithUnderscore[normalized];
   }
   
-  // Partial matching - check if normalized text contains any bin name
-  for (const [binName, category] of Object.entries(binMapping)) {
+  // Try without underscore
+  const normalizedNoUnderscore = normalized.replace(/_/g, '');
+  console.log('Normalized (no underscore):', normalizedNoUnderscore);
+  
+  if (binMappingNoUnderscore[normalizedNoUnderscore]) {
+    console.log('✓ Direct match (no underscore) found:', binMappingNoUnderscore[normalizedNoUnderscore]);
+    console.log('========== END PARSER DEBUG ==========');
+    return binMappingNoUnderscore[normalizedNoUnderscore];
+  }
+  
+  // Try partial matching with both formats
+  for (const [binName, category] of Object.entries(binMappingWithUnderscore)) {
     if (normalized.includes(binName) || binName.includes(normalized)) {
       console.log('✓ Partial match found:', category);
       console.log('========== END PARSER DEBUG ==========');
@@ -113,7 +136,8 @@ export const parseBinCategory = (qrText: string): string | null => {
   }
   
   console.log('✗ No match found');
-  console.log('Available bins:', Object.keys(binMapping));
+  console.log('Available bins (with underscore):', Object.keys(binMappingWithUnderscore));
+  console.log('Available bins (no underscore):', Object.keys(binMappingNoUnderscore));
   console.log('========== END PARSER DEBUG ==========');
   
   return null;
@@ -122,3 +146,5 @@ export const parseBinCategory = (qrText: string): string | null => {
 export const getCategoryDisplayName = (category: string): string => {
   return category.replace(/_/g, ' - ');
 };
+
+
