@@ -6,6 +6,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useScanTimer } from '../hooks/useScanTimer';
 import { QRScanner } from '../components/QRScanner';
 import { parseBinCategory, getCategoryDisplayName } from '../utils/qrParser';
+import { useNavigate } from 'react-router-dom';
 
 import {
   Leaf,
@@ -514,7 +515,7 @@ const handleQRScan = (qrText: string) => {
 // 1. Hero Section
 const Hero = () => {
   
-  
+  const navigate = useNavigate();
 
   const scrollToClassifier = () => {
     document.getElementById('WasteClassifier')?.scrollIntoView({ behavior: "smooth" });
@@ -549,7 +550,9 @@ const Hero = () => {
                <Camera size={20} className="group-hover:rotate-12 transition-transform" />
                Start Scanning
              </button>
-             <button className="h-14 px-8 rounded-full bg-white text-[#111827] font-bold text-lg border border-gray-200 shadow-md hover:bg-[#F9FAFB] hover:scale-105 transition-all">
+             <button 
+              onClick={() => navigate('/shop')}
+             className="h-14 px-8 rounded-full bg-white text-[#111827] font-bold text-lg border border-gray-200 shadow-md hover:bg-[#F9FAFB] hover:scale-105 transition-all">
                View Marketplace
              </button>
           </div>

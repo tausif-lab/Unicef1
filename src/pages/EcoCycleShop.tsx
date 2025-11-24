@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import { Search, Bell, Heart, User, ShoppingBag, ArrowRight } from 'lucide-react';
 
 const EcoShop = () => {
