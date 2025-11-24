@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import EcoCycleShop from "./pages/EcoCycleShop";
+import EcoDIYProducts from "./pages/EcoDIYProducts";
+import Coupon from "./pages/Coupon";
 
 const queryClient = new QueryClient();
 
@@ -19,6 +21,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
          <Route path="/shop" element={<EcoCycleShop />} />
+          <Route path="/diy-products" element={<EcoDIYProducts />} />
+          <Route path="/coupons" element={<Coupon />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           
         </Routes>

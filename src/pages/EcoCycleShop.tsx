@@ -1,8 +1,9 @@
 import  { useState } from 'react';
 import { Search, Bell, Heart, User, ShoppingBag, ArrowRight } from 'lucide-react';
-
+import { useNavigate } from 'react-router-dom';
 const EcoShop = () => {
   const [activeTab, setActiveTab] = useState('home');
+  const navigate = useNavigate();
 
   const stores = [
     {
@@ -73,7 +74,7 @@ const EcoShop = () => {
           </div>
         </div>
       </div>
-
+     
       {/* Main Content */}
       <div className="max-w-md mx-auto px-4 py-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-6">Select Your Store</h2>
@@ -81,10 +82,15 @@ const EcoShop = () => {
         {/* Store Cards */}
         <div className="space-y-4">
           {stores.map((store) => (
-            <div
+             <div
               key={store.id}
-              className="relative overflow-hidden rounded-[24px] shadow-[0_20px_40px_-12px_rgba(16,185,129,0.1)] hover:shadow-[0_24px_48px_-12px_rgba(16,185,129,0.15)] transition-all duration-300 hover:-translate-y-1 cursor-pointer active:scale-[0.98]"
-            >
+              onClick={() => {
+              if (store.id === 'diy') navigate('/diy-products');
+              if (store.id === 'coupons') navigate('/coupons');
+              }}
+             className="relative overflow-hidden rounded-[24px] shadow-[0_20px_40px_-12px_rgba(16,185,129,0.1)] hover:shadow-[0_24px_48px_-12px_rgba(16,185,129,0.15)] transition-all duration-300 hover:-translate-y-1 cursor-pointer active:scale-[0.98]"
+             >
+
               <div className={`bg-gradient-to-br ${store.bgColor} p-6 min-h-[180px] flex flex-col justify-between`}>
                 {/* Store Header */}
                 <div className="flex items-start justify-between">
