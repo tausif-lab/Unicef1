@@ -48,13 +48,7 @@ const EcoShop = () => {
       {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-md mx-auto px-4 py-3">
-          {/* Top Bar */}
-          <div className="flex items-center justify-between mb-3">
-            <div className="text-xs text-gray-500">11:27</div>
-            <div className="flex items-center gap-2 text-xs text-gray-500">
-              <span>63%</span>
-            </div>
-          </div>
+          
 
           {/* Search Bar */}
           <div className="relative mb-4">
