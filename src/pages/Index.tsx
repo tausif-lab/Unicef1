@@ -225,7 +225,7 @@ const WasteClassifier: React.FC = () => {
 
   const mapPredictionsToWasteCategory = (predictions: Prediction[]) => {
     const wasteCategories = {
-      Plastic_PET: ['water bottle', 'juice bottle', 'beverage bottle', 'bottle'],
+      Plastic_PET_greenbin: ['water bottle', 'juice bottle', 'beverage bottle', 'bottle'],
       Plastic_Flexible: ['wrapper', 'packet', 'bag', 'pouch', 'plastic bag'],
       Plastic_Rigid: ['container', 'shampoo', 'lotion', 'dispenser', 'soap', 'detergent'],
       Plastic_Cutlery: ['cup', 'spoon', 'fork', 'mug', 'utensil'],
