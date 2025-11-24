@@ -162,7 +162,7 @@ export const parseBinCategory = (qrText: string): string | null => {
   // 2. Define Keywords to Category Map
   // The key is the "Word to find in QR", the value is "Category ID matching Index.tsx"
   const keywordMap: Record<string, string> = {
-    'PET': 'Plastic_PET_greenbin',
+    'PET': 'PET_greenbin',
     'FLEXIBLE': 'Plastic_Flexible',
     'RIGID': 'Plastic_Rigid',
     'CUTLERY': 'Plastic_Cutlery',
