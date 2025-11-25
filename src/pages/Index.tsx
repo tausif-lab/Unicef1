@@ -230,7 +230,7 @@ const WasteClassifier: React.FC = () => {
       Plastic_Rigid: ['container', 'shampoo', 'lotion', 'dispenser', 'soap', 'detergent'],
       Plastic_Cutlery: ['cup', 'spoon', 'fork', 'mug', 'utensil'],
       Metal: ['can', 'tin', 'aluminum', 'metal', 'soda can', 'beer can'],
-      Paper: ['paper', 'notebook', 'cardboard', 'magazine', 'newspaper', 'envelope', 'carton'],
+      Paper: ['paper', 'nappy' ,'handkerchief','notebook', 'cardboard', 'magazine', 'newspaper', 'envelope', 'carton'],
       Glass: ['glass', 'jar', 'glass bottle', 'wine bottle'],
     };
 
