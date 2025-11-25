@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Search, Heart, ShoppingBag, ChevronDown, SlidersHorizontal, Star, ShoppingCart, Share2, X } from 'lucide-react';
-import placeholderImage from '../assets/IMG_1470.jpg';
+
 import placeholderImage1 from '../assets/IMG_1471.jpg';
 import placeholderImage2 from '../assets/IMG_1472.jpg';
 import placeholderImage3 from '../assets/IMG_1473.jpg';
@@ -8,6 +8,17 @@ import placeholderImage4 from '../assets/IMG_1474.jpg';
 import placeholderImage5 from '../assets/IMG_1475.jpg';
 import placeholderImage6 from '../assets/IMG_1476.jpg';
 import placeholderImage7 from '../assets/614MPycteqL.jpg';
+import placeholderImage8 from '../Screenshot2.jpg';
+import placeholderImage9 from '../Screenshot3.jpg';
+import placeholderImage10 from '../Screenshot1.jpg';
+import placeholderImage11 from '../Screenshot4.jpg';
+import placeholderImage12 from '../Screenshot5.jpg';
+
+
+
+
+
+
 interface Product {
   id: number;
   name: string;
@@ -150,53 +161,88 @@ const EcoDIYProducts = () => {
       sustainability: 'Made from 200g of recycled plastic'
     },
     {
-      id: 8,
-      name: 'Eco Laptop Stand',
-      price: 899,
-      originalPrice: 1499,
-      discount: 40,
-      image: placeholderImage1,
-      brand: 'TechCycle',
-      rating: 4.8,
-      reviews: 678,
-      category: 'office',
-      description: 'Adjustable laptop stand with ergonomic design. Made from industrial recycled plastic. Supports laptops up to 17 inches.',
-      features: ['6 height levels', 'Heat ventilation', 'Non-slip pads', 'Foldable design'],
-      materials: 'Industrial Recycled ABS',
-      sustainability: 'Each stand prevents 800g of industrial waste'
-    },
-    {
-      id: 9,
-      name: 'Recycled Phone Holder',
-      price: 199,
-      originalPrice: 349,
-      discount: 43,
-      image: placeholderImage,
-      brand: 'GreenTech',
-      rating: 4.5,
-      reviews: 892,
-      category: 'office',
-      description: 'Adjustable phone holder for desk or car. Made from recycled e-waste plastic. Universal fit for all smartphone sizes.',
-      features: ['360° rotation', 'Adjustable angle', 'Non-slip base', 'Cable management'],
-      materials: 'E-waste Recycled Plastic',
-      sustainability: 'Repurposes electronic waste plastic'
-    },
-    {
-      id: 10,
-      name: 'Upcycled Wall Clock',
-      price: 649,
-      originalPrice: 999,
-      discount: 35,
-      image: placeholderImage,
-      brand: 'EcoTime',
-      rating: 4.7,
-      reviews: 345,
-      category: 'home-decor',
-      description: 'Modern wall clock with silent quartz movement. Frame made from recycled plastic with eco-friendly ink printing.',
-      features: ['Silent movement', 'Battery included', 'Easy wall mount', '12-inch diameter'],
-      materials: 'Recycled Plastic Frame',
-      sustainability: 'Made from 400g of recycled plastic'
-    }
+  id: 8,
+  name: 'Kutch-Style Woven Bag',
+  price: 299,
+  originalPrice: null,
+  discount: null,
+  image: placeholderImage8,
+  brand: 'EcoCraft India',
+  rating: 4.7,
+  reviews: 312,
+  category: 'fashion',
+  description: 'Traditional Gujarat Kutch-inspired recycled-plastic woven bag crafted by rural artisans. Features bold geometric motifs, vibrant colors, and a strong cultural identity from the state of Gujarat.',
+  features: ['Handwoven plastic strips', 'Kutch embroidery patterns', 'Lightweight & durable', 'Water-resistant'],
+  materials: 'Recycled plastic packaging strips',
+  sustainability: 'Made using 12 discarded plastic wrappers'
+},
+
+{
+  id: 10,
+  name: 'Channapatna Style Toy Miniature',
+  price: 349,
+  originalPrice: null,
+  discount: null,
+  image: placeholderImage10,
+  brand: 'EcoCraft India',
+  rating: 4.8,
+  reviews: 189,
+  category: 'toys',
+  description: 'Colorful toy miniature made from recycled plastic, inspired by the iconic Channapatna lacquer toy craft of Karnataka. Features smooth rounded shapes and vibrant glossy colors typical of Karnataka’s craft heritage.',
+  features: ['Glossy finish', 'Kid-safe paint', 'Handcrafted look', 'Durable build'],
+  materials: 'Molded recycled plastic',
+  sustainability: 'Made using 9 recycled plastic bottles'
+},
+{
+  id: 11,
+  name: 'Kathakali Face Magnet',
+  price: 149,
+  originalPrice: null,
+  discount: null,
+  image: placeholderImage9,
+  brand: 'EcoCraft India',
+  rating: 4.5,
+  reviews: 267,
+  category: 'home-decor',
+  description: 'Recycled-plastic fridge magnet inspired by Kerala’s traditional Kathakali art. Features a simplified Kathakali mask silhouette painted in vibrant Kerala color themes.',
+  features: ['Strong magnet grip', 'Hand-painted details', 'Compact size', 'Moisture-proof'],
+  materials: 'Recycled molded plastic',
+  sustainability: 'Made using 3 plastic bottle caps'
+},
+{
+  id: 12,
+  name: 'Pattachitra Art Decorative Plate',
+  price: 399,
+  originalPrice: null,
+  discount: null,
+  image: placeholderImage12,
+  brand: 'EcoCraft India',
+  rating: 4.9,
+  reviews: 301,
+  category: 'art',
+  description: 'Decorative plate crafted from recycled plastic and painted in the intricate Pattachitra style of Odisha. Showcases fine linework and folk motifs inspired by Odisha’s traditional art form.',
+  features: ['Intricate hand-painting', 'Wall-mount ready', 'Lightweight', 'Waterproof finish'],
+  materials: 'Recycled plastic plate',
+  sustainability: 'Made using 5 repurposed plastic plates'
+},
+{
+  id: 13,
+  name: 'Phulkari Style Wall Art',
+  price: 249,
+  originalPrice: null,
+  discount: null,
+  image: placeholderImage11,
+  brand: 'EcoCraft India',
+  rating: 4.7,
+  reviews: 198,
+  category: 'home-decor',
+  description: 'Colorful recycled-plastic wall art inspired by Punjab’s Phulkari embroidery. Features bright stitch-like patterns and motifs reflecting the cultural artistry of the state of Punjab.',
+  features: ['Vibrant colors', 'Ready to hang', 'Hand-painted patterns', 'Reusable material'],
+  materials: 'Recycled plastic sheet',
+  sustainability: 'Made using 8 waste plastic covers'
+}
+
+    
   ];
 
   const toggleFavorite = (id: number, e?: React.MouseEvent) => {
