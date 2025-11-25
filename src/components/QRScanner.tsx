@@ -207,137 +207,7 @@ const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
 
    
 
- /*
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    setIsProcessing(true);
-    setScanError(null);
-    setDebugInfo('');
-
-    try {
-      // Check if file is an image
-      if (!file.type.startsWith('image/')) {
-        setScanError('Please upload a valid image file');
-        setIsProcessing(false);
-        return;
-      }
-
-      setDebugInfo('Loading image...');
-      
-      
-      
-      const img = new Image();
-      const reader = new FileReader();
-      
-      reader.onerror = () => {
-        setScanError('Failed to read image file');
-        setIsProcessing(false);
-      };
-      
-      reader.onload = (e) => {
-        if (!e.target?.result) {
-          setScanError('Failed to load image data');
-          setIsProcessing(false);
-          return;
-        }
-
-        img.onerror = () => {
-          setScanError('Failed to decode image');
-          setIsProcessing(false);
-        };
-
-        img.onload = () => {
-          try {
-            setDebugInfo(`Image loaded: ${img.width}x${img.height}`);
-            
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d', { willReadFrequently: true });
-            
-            if (!ctx) {
-              setScanError('Canvas not supported by browser');
-              setIsProcessing(false);
-              return;
-            }
-            
-            // Set canvas size to match image
-            canvas.width = img.width;
-            canvas.height = img.height;
-            
-            // Draw image on canvas
-            ctx.drawImage(img, 0, 0);
-            
-            setDebugInfo(`Processing ${canvas.width}x${canvas.height} image...`);
-            
-            // Get image data
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            
-            // Try to detect QR code with multiple attempts and different options
-            let code = jsQR(imageData.data, imageData.width, imageData.height, {
-              inversionAttempts: "dontInvert",
-            });
-
-            // If not found, try with inversion
-            if (!code) {
-              setDebugInfo('Retrying with color inversion...');
-              code = jsQR(imageData.data, imageData.width, imageData.height, {
-                inversionAttempts: "attemptBoth",
-              });
-            }
-
-            // If still not found, try preprocessing the image
-            if (!code) {
-              setDebugInfo('Applying image preprocessing...');
-              
-              // Increase contrast
-              for (let i = 0; i < imageData.data.length; i += 4) {
-                const avg = (imageData.data[i] + imageData.data[i + 1] + imageData.data[i + 2]) / 3;
-                const value = avg > 128 ? 255 : 0;
-                imageData.data[i] = value;
-                imageData.data[i + 1] = value;
-                imageData.data[i + 2] = value;
-              }
-              
-              code = jsQR(imageData.data, imageData.width, imageData.height, {
-                inversionAttempts: "attemptBoth",
-              });
-            }
-            
-            if (code && code.data) {
-              console.log('========== QR DEBUG ==========');
-              console.log('Raw QR data:', code.data);
-              console.log('QR length:', code.data.length);
-              console.log('QR characters:', code.data.split('').map(c => `${c}(${c.charCodeAt(0)})`));
-               console.log('========== END DEBUG ==========');
-  
-               setDebugInfo(`✓ QR Code found: ${code.data}`);
-               setScanError(null);
-                onScan(code.data);
-               } else {
-              setScanError('No QR code detected. Please ensure:\n• QR code is clearly visible\n• Image is well-lit\n• QR code takes up most of the image\n• Try taking photo from directly above');
-              setDebugInfo('No QR pattern detected in image');
-            }
-            
-            setIsProcessing(false);
-          } catch (err) {
-            console.error('QR processing error:', err);
-            setScanError('Error processing image: ' + (err as Error).message);
-            setIsProcessing(false);
-          }
-        };
-        
-        img.src = e.target.result as string;
-      };
-      
-      reader.readAsDataURL(file);
-    } catch (err) {
-      console.error('QR scan error:', err);
-      setScanError('Failed to scan QR code: ' + (err as Error).message);
-      setIsProcessing(false);
-    }
-  };*/
-
+ 
 
 
 
@@ -366,7 +236,7 @@ const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
           ref={fileInputRef}
           type="file"
           accept="image/*"
-          capture="environment"
+          //capture="environment"
           onChange={handleFileUpload}
           className="hidden"
         />
@@ -390,6 +260,9 @@ const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
             </>
           )}
         </button>
+        <p className="text-xs text-gray-500 mt-3 text-center">
+          📷 Camera • 🖼️ Gallery • 📁 Files
+        </p>
         {isProcessing && (
         <div className="mt-4 flex flex-col items-center gap-2">
           <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">

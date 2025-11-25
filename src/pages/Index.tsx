@@ -555,6 +555,11 @@ const Hero = () => {
              className="h-14 px-8 rounded-full bg-white text-[#111827] font-bold text-lg border border-gray-200 shadow-md hover:bg-[#F9FAFB] hover:scale-105 transition-all">
                View Marketplace
              </button>
+             <button 
+              onClick={() => navigate('/location')}
+             className="h-14 px-8 rounded-full bg-[#111827] text-white font-bold text-lg border border-gray-200 shadow-md hover:bg-[#F9FAFB] hover:scale-105 transition-all">
+               Locate Bins
+             </button>
           </div>
        </div>
     </section>
