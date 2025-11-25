@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Search, Heart, ShoppingBag, ChevronDown, SlidersHorizontal, Star, ShoppingCart, Share2, X } from 'lucide-react';
-import placeholderImage from '../assets/IMG_1470.jpg';
-import placeholderImage1 from '../assets/IMG_1471.jpg';
-import placeholderImage2 from '../assets/IMG_1472.jpg';
-import placeholderImage3 from '../assets/IMG_1473.jpg';
-import placeholderImage4 from '../assets/IMG_1474.jpg';
-import placeholderImage5 from '../assets/IMG_1475.jpg';
-import placeholderImage6 from '../assets/IMG_1476.jpg';
-import placeholderImage7 from '../assets/614MPycteqL.jpg';
+import placeholderImage from '../assets/1_e103e24f-ef8c-452d-90ca-3137bfe79524.jpg';
+import placeholderImage1 from '../assets/561A4711.jpg';
+import placeholderImage2 from '../assets/matte-polo-solid-t-shirt-black-439282_2048x2048.jpg';
+import placeholderImage3 from '../assets/feather-touch-round-neck-plain-honey-brown-t-shirt-for-men-7664364_2048x2048.jpg';
+
+
 interface Product {
   id: number;
   name: string;
@@ -32,171 +30,92 @@ const EcoDIYProducts = () => {
   const products: Product[] = [
     {
   id: 1,
-  name: 'Recycled Plastic Glue Gun Sticks',
-  price: 8,
-  originalPrice: 10,
-  discount: 20,
-  image: placeholderImage7,
-  brand: 'EcoGrow',
-  rating: 4.6,
-  reviews: 412,
-  category: 'diy-craft',
-  description: 'High-quality glue gun sticks made from 100% recycled plastic. Designed for strong bonding, smooth flow, and fast setting. Ideal for crafts, DIY repairs, and model making.',
+  name: 'Thaely Y2K Sneakers',
+  price: 4990,
+  originalPrice: 5990,
+  discount: 17,
+  image: placeholderImage,
+  brand: 'Thaely',
+  rating: 4.7,
+  reviews: 582,
+  category: 'footwear',
+  description: 'Sustainable sneakers made from recycled plastic bags and bottles. Features ThaelyTex, a cruelty-free leather alternative created entirely from waste plastic.',
   features: [
-    'Strong bonding with plastic, wood, fabric, and paper',
-    'Low-temperature melting for safer use',
-    'Smooth, consistent flow',
-    'Non-toxic and odorless',
-    'Uniform size for all mini glue guns'
+    'Made from 10 plastic bags and 12 recycled bottles per pair',
+    'Anti-slip recycled rubber sole',
+    'Vegan and cruelty-free materials',
+    'Breathable and durable'
   ],
-  materials: 'LPDE 80% and HDPE 20% ,pine resine, wax',
-  sustainability: 'Each pack diverts approximately 20g of plastic from landfills by turning waste into useful DIY material'
+  materials: 'ThaelyTex (Recycled Plastic Bags + PET Bottles), Recycled Rubber Sole',
+  sustainability: 'Each pair prevents ~22 plastic items from entering landfills and oceans'
 },
 
     {
-      id: 2,
-      name: 'Upcycled Bottle Organizer',
-      price: 599,
-      originalPrice: null,
-      discount: null,
-      image: placeholderImage1,
-      brand: 'GreenSpace',
-      rating: 4.8,
-      reviews: 456,
-      category: 'storage',
-      description: 'Multi-compartment desk organizer crafted from upcycled plastic bottles. Keeps your workspace tidy and organized.',
-      features: ['5 compartments', 'Non-slip base', 'Easy to clean', 'Modern design'],
-      materials: 'Upcycled PET bottles',
-      sustainability: 'Made from 15 recycled plastic bottles'
-    },
-    {
-      id: 3,
-      name: 'Eco-Friendly Storage Box',
-      price: 449,
-      originalPrice: 899,
-      discount: 50,
-      image:placeholderImage2,
-      brand: 'RecycleHub',
-      rating: 4.3,
-      reviews: 189,
-      category: 'storage',
-      description: 'Stackable storage box with lid, perfect for organizing toys, clothes, or accessories. Made from recycled HDPE plastic.',
-      features: ['Stackable design', 'Secure lid', '10L capacity', 'Reinforced handles'],
-      materials: 'Recycled HDPE Plastic',
-      sustainability: 'Diverts 1kg of plastic waste from landfills'
-    },
-    {
-      id: 4,
-      name: 'Recycled Plastic Vase',
-      price: 299,
-      originalPrice: 499,
-      discount: 40,
-      image: placeholderImage3,
-      brand: 'EcoArt',
-      rating: 4.6,
-      reviews: 312,
-      category: 'home-decor',
-      description: 'Elegant decorative vase with textured finish. Each piece is unique, handmade from recycled plastic with artistic patterns.',
-      features: ['Waterproof', 'Handcrafted', 'Unique patterns', 'Scratch resistant'],
-      materials: 'Mixed Recycled Plastics',
-      sustainability: 'Each vase reuses 300g of plastic waste'
-    },
-    {
-      id: 5,
-      name: 'DIY Garden Tool Kit',
-      price: 799,
-      originalPrice: 1299,
-      discount: 38,
-      image: placeholderImage4,
-      brand: 'GreenTools',
-      rating: 4.7,
-      reviews: 567,
-      category: 'garden',
-      description: 'Complete gardening toolkit with 5 essential tools. Ergonomic handles made from recycled plastic for comfortable grip.',
-      features: ['5-piece set', 'Ergonomic grip', 'Rust-proof', 'Carrying pouch included'],
-      materials: 'Recycled PP & Steel',
-      sustainability: 'Handles made from 100% recycled plastic'
-    },
-    {
-      id: 6,
-      name: 'Plastic Bottle Bird Feeder',
-      price: 249,
-      originalPrice: null,
-      discount: null,
-      image: placeholderImage5,
-      brand: 'EcoGrow',
-      rating: 4.4,
-      reviews: 278,
-      category: 'garden',
-      description: 'Charming bird feeder crafted from upcycled bottles. Easy to fill and clean, attracts various bird species to your garden.',
-      features: ['Easy refill', 'Weather resistant', 'Hanging hook included', 'Easy to clean'],
-      materials: 'Upcycled PET Bottles',
-      sustainability: 'Gives new life to discarded bottles'
-    },
-    {
-      id: 7,
-      name: 'Recycled Cutlery Set',
-      price: 399,
-      originalPrice: 699,
-      discount: 43,
-      image: placeholderImage6,
-      brand: 'EcoTable',
-      rating: 4.6,
-      reviews: 423,
-      category: 'kitchen',
-      description: 'Durable cutlery set for 4 people. Made from food-grade recycled plastic. Perfect for picnics, camping, or everyday use.',
-      features: ['BPA-free', 'Dishwasher safe', 'Lightweight', '12-piece set'],
-      materials: 'Food-grade Recycled Plastic',
-      sustainability: 'Made from 200g of recycled plastic'
-    },
-    {
-      id: 8,
-      name: 'Eco Laptop Stand',
-      price: 899,
-      originalPrice: 1499,
-      discount: 40,
-      image: placeholderImage1,
-      brand: 'TechCycle',
-      rating: 4.8,
-      reviews: 678,
-      category: 'office',
-      description: 'Adjustable laptop stand with ergonomic design. Made from industrial recycled plastic. Supports laptops up to 17 inches.',
-      features: ['6 height levels', 'Heat ventilation', 'Non-slip pads', 'Foldable design'],
-      materials: 'Industrial Recycled ABS',
-      sustainability: 'Each stand prevents 800g of industrial waste'
-    },
-    {
-      id: 9,
-      name: 'Recycled Phone Holder',
-      price: 199,
-      originalPrice: 349,
-      discount: 43,
-      image: placeholderImage,
-      brand: 'GreenTech',
-      rating: 4.5,
-      reviews: 892,
-      category: 'office',
-      description: 'Adjustable phone holder for desk or car. Made from recycled e-waste plastic. Universal fit for all smartphone sizes.',
-      features: ['360° rotation', 'Adjustable angle', 'Non-slip base', 'Cable management'],
-      materials: 'E-waste Recycled Plastic',
-      sustainability: 'Repurposes electronic waste plastic'
-    },
-    {
-      id: 10,
-      name: 'Upcycled Wall Clock',
-      price: 649,
-      originalPrice: 999,
-      discount: 35,
-      image: placeholderImage,
-      brand: 'EcoTime',
-      rating: 4.7,
-      reviews: 345,
-      category: 'home-decor',
-      description: 'Modern wall clock with silent quartz movement. Frame made from recycled plastic with eco-friendly ink printing.',
-      features: ['Silent movement', 'Battery included', 'Easy wall mount', '12-inch diameter'],
-      materials: 'Recycled Plastic Frame',
-      sustainability: 'Made from 400g of recycled plastic'
-    }
+  id: 2,
+  name: 'EcoKaari Upcycled Handwoven Tote',
+  price: 1299,
+  originalPrice: 1799,
+  discount: 28,
+  image: placeholderImage1,
+  brand: 'EcoKaari',
+  rating: 4.6,
+  reviews: 311,
+  category: 'bags-and-accessories',
+  description: 'Handwoven tote bag made from upcycled waste plastic using traditional Indian charkha and handloom techniques. Crafted by women artisans.',
+  features: [
+    'Handwoven from multi-layer plastic waste',
+    'Durable and washable',
+    'Ethically made by rural artisans',
+    'Lightweight, strong, and stylish'
+  ],
+  materials: '100% Upcycled Plastic Wrappers & Bags',
+  sustainability: 'Each tote diverts 50–70 discarded plastic bags from landfills while supporting artisan livelihoods'
+},
+
+  {
+  id: 3,
+  name: 'Unirec Recycled PET Polo T-Shirt',
+  price: 899,
+  originalPrice: 1499,
+  discount: 40,
+  image: placeholderImage2,
+  brand: 'Unirec',
+  rating: 4.4,
+  reviews: 198,
+  category: 'apparel',
+  description: 'Premium polo T-shirt made entirely from recycled PET bottles. Soft, breathable, and optimized for all-day comfort.',
+  features: [
+    'Moisture-wicking recycled fabric',
+    'Soft and skin-friendly texture',
+    'Colorfast and long-lasting',
+    'Machine washable'
+  ],
+  materials: '100% Recycled PET Bottle Fabric',
+  sustainability: 'Each T-shirt upcycles 6–8 plastic bottles and reduces carbon footprint by 60% compared to virgin polyester'
+},
+  {
+  id: 4,
+  name: 'Feather Touch Round Neck Plain Honey Brown T-Shirt for Men',
+  price: 899,
+  originalPrice: 100,
+  discount: 40,
+  image: placeholderImage3,
+  brand: 'Unirec',
+  rating: 4.4,
+  reviews: 198,
+  category: 'apparel',
+  description: 'Premium polo T-shirt made entirely from recycled PET bottles. Soft, breathable, and optimized for all-day comfort.',
+  features: [
+    'Moisture-wicking recycled fabric',
+    'Soft and skin-friendly texture',
+    'Colorfast and long-lasting',
+    'Machine washable'
+  ],
+  materials: '100% Recycled PET Bottle Fabric',
+  sustainability: 'Each T-shirt upcycles 6–8 plastic bottles and reduces carbon footprint by 60% compared to virgin polyester'
+},
+   
+    
   ];
 
   const toggleFavorite = (id: number, e?: React.MouseEvent) => {

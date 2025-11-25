@@ -167,7 +167,7 @@ export const parseBinCategory = (qrText: string): string | null => {
     'RIGID': 'Plastic_Rigid',
     'CUTLERY': 'Plastic_Cutlery',
     'METAL': 'Metal',
-    'PAPER': 'Paper',
+    'PAPER': 'per_Yellow',
     'GLASS': 'Glass',
     'ORGANIC': 'Organic',
     // Add common variations if needed

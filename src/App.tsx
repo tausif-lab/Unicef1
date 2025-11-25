@@ -10,6 +10,7 @@ import EcoDIYProducts from "./pages/EcoDIYProducts";
 import Coupon from "./pages/Coupon";
 import CompanyRegistration from "./pages/companyRegister";
 import Registeredlocation from "./pages/map";
+import Luxe from "./pages/Luxe";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -27,6 +28,7 @@ const App = () => (
           
           <Route path="/company-register" element={<CompanyRegistration />} />
            <Route path="/location" element={<Registeredlocation />} />
+          <Route path="/luxe" element={<Luxe />} />
           
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

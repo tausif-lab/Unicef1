@@ -88,6 +88,7 @@ const EcoShop = () => {
               if (store.id === 'diy') navigate('/diy-products');
               if (store.id === 'coupons') navigate('/coupons');
               if (store.id === 'Join') navigate('/company-register');
+              if (store.id === 'premium') navigate('/luxe');
               }}
              className="relative overflow-hidden rounded-[24px] shadow-[0_20px_40px_-12px_rgba(16,185,129,0.1)] hover:shadow-[0_24px_48px_-12px_rgba(16,185,129,0.15)] transition-all duration-300 hover:-translate-y-1 cursor-pointer active:scale-[0.98]"
              >
