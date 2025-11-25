@@ -9,7 +9,7 @@ import placeholderImage5 from '../assets/IMG_1475.jpg';
 import placeholderImage6 from '../assets/IMG_1476.jpg';
 import placeholderImage7 from '../assets/614MPycteqL.jpg';
 import placeholderImage8 from '../Screenshot2.jpg';
-import placeholderImage9 from '../Screenshot3.jpg';
+
 import placeholderImage10 from '../Screenshot1.jpg';
 import placeholderImage11 from '../Screenshot4.jpg';
 import placeholderImage12 from '../Screenshot5.jpg';
@@ -193,22 +193,7 @@ const EcoDIYProducts = () => {
   materials: 'Molded recycled plastic',
   sustainability: 'Made using 9 recycled plastic bottles'
 },
-{
-  id: 11,
-  name: 'Kathakali Face Magnet',
-  price: 149,
-  originalPrice: null,
-  discount: null,
-  image: placeholderImage9,
-  brand: 'EcoCraft India',
-  rating: 4.5,
-  reviews: 267,
-  category: 'home-decor',
-  description: 'Recycled-plastic fridge magnet inspired by Kerala’s traditional Kathakali art. Features a simplified Kathakali mask silhouette painted in vibrant Kerala color themes.',
-  features: ['Strong magnet grip', 'Hand-painted details', 'Compact size', 'Moisture-proof'],
-  materials: 'Recycled molded plastic',
-  sustainability: 'Made using 3 plastic bottle caps'
-},
+
 {
   id: 12,
   name: 'Pattachitra Art Decorative Plate',
